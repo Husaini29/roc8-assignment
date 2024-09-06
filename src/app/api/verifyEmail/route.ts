@@ -1,0 +1,40 @@
+import { PrismaClient } from "@prisma/client";
+import { NextRequest } from "next/server";
+
+const prisma = new PrismaClient();
+
+export async function POST(req:NextRequest){
+    const { email,verifyOtp } = await req.json();
+
+    try {
+
+      if (!email || !verifyOtp) {
+        return Response.json({ status: 400, message: "Email and Otp are required" }, { status: 400 });
+      }
+      
+      const user = await prisma.user.findUnique({
+        where:{ email }
+      });
+
+      if(!user){
+        return Response.json({ status:400, message:"User not found"})
+      }
+      
+      if(user.otp !== verifyOtp){
+        return Response.json({ status:400, message:"Invalid Otp"})
+      }
+
+      await prisma.user.update({
+        where:{ id: user.id },
+        data:{
+          emailVerified:true,
+          otp:null
+        }
+      });
+
+      return Response.json({status:200, message:"Email verified successfully"})
+      
+    } catch (error) {
+        return Response.json({ status:500, message:"Internal server error"})
+    }
+}
