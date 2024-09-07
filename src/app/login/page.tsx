@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
-import { loginSchema } from '@/schemas/loginSchema';
+import { loginSchema } from '../../schemas/loginSchema';
 import toast from 'react-hot-toast';
 
 

@@ -87,7 +87,7 @@ export default function HomePage() {
   }
 
 
-  const updateUserCategories = useCallback(async()=>{
+  const updateUserCategories = async()=>{
     try {
       const response = await fetch("/api/user-categories",{
         method:"POST",
@@ -106,7 +106,7 @@ export default function HomePage() {
     } catch (error) {
         toast.error((error as Error).message);
     }
-  },[selectedCategories])
+  }
 
   useEffect(()=>{
     void fetchUser();
@@ -120,7 +120,7 @@ export default function HomePage() {
     if(selectedCategories.length >=1 ){
        void updateUserCategories();
     }
-  },[selectedCategories,updateUserCategories]);
+  },[selectedCategories]);
 
   return (
     <div className='flex justify-center s mt-8'>
