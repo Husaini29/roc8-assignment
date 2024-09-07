@@ -21,17 +21,17 @@ export async function POST(req:NextRequest){
         });
 
         if(!user){
-            return Response.json({ status:401, message:'Invalid email address'})
+            return Response.json({ status:401, errror:'Invalid email address'})
         }
 
         const isPasswordCorrect = await bcrypt.compare(password,user.password);
 
         if(!isPasswordCorrect){
-            return Response.json({ status:401, message:'Invalid Password'})
+            return Response.json({ status:401, errror:'Invalid Password'})
         }
 
         if(!user.emailVerified){
-            return Response.json({ status:401, message:'Please verify your email'})
+            return Response.json({ status:401, error:'Please verify your email'})
         }
 
         const tokenData = {
