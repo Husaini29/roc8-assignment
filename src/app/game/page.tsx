@@ -1,24 +1,26 @@
 "use client"
 
-import React, { useState,useEffect } from "react"
+import React, { useState,useEffect, useCallback } from "react";
 
-export default function page(){
+type Grid = number[][];
+
+export default function GameOfLife(){
 
   const rows = 30;
   const cols = 30;
 
-  const createEmptyGrid = () => {
+  const createEmptyGrid = ():Grid => {
     return Array.from({ length: rows }).map(() =>
       Array.from({ length: cols }).fill(0)
-    );
+    ) as Grid;
   };
 
-  const [grid,setGrid] = useState(createEmptyGrid());
-  const [running,setRunning] = useState(false);
+  const [grid,setGrid] = useState<Grid>(createEmptyGrid());
+  const [running,setRunning] = useState<boolean>(false);
 
   // Calculate next state of grid 
 
-  const nextGridState = (grid:any) => {
+  const nextGridState = useCallback((grid:Grid):Grid => {
     const newGrid = createEmptyGrid();
 
     for(let r=0; r < rows; r++){
@@ -62,7 +64,7 @@ export default function page(){
       }
     }
     return newGrid;
-  }
+  },[])
 
   // Function to start/stop
 
@@ -71,14 +73,14 @@ export default function page(){
   }
 
   const randomizeGrid = () => {
-    const newGrid = grid.map((row) =>
+    const newGrid:Grid = grid.map((row) =>
       row.map(() => (Math.random() > 0.7 ? 1 : 0))
     );
     setGrid(newGrid);
   };
 
   const toggleCellState = (row:number,col:number) =>{
-    const newGrid = grid.map((rowArr,r) =>
+    const newGrid:Grid = grid.map((rowArr,r) =>
       rowArr.map((cell,c) => ( r === row && c === col ? (cell ? 0 : 1) : cell))
     )
     setGrid(newGrid);
@@ -93,7 +95,7 @@ export default function page(){
     },100);
 
     return ()=> clearInterval(interval);
-  },[running])
+  },[running,nextGridState])
 
   return(
         <div>

@@ -1,10 +1,16 @@
 import { PrismaClient } from "@prisma/client";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
+interface VerifyEmailType{
+  email:string,
+  verifyOtp:string
+}
+
 export async function POST(req:NextRequest){
-    const { email,verifyOtp } = await req.json();
+    const { email,verifyOtp }: VerifyEmailType = await req.json() as VerifyEmailType;
 
     try {
 
@@ -35,6 +41,7 @@ export async function POST(req:NextRequest){
       return Response.json({status:200, message:"Email verified successfully"})
       
     } catch (error) {
-        return Response.json({ status:500, message:"Internal server error"})
+      const errorMessage = (error as Error).message || 'Internal server error';
+      return NextResponse.json({ status: 500, message: errorMessage });
     }
 }

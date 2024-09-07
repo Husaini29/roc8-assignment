@@ -1,14 +1,14 @@
 import getDataFromToken from "@/helpers/getDataFromToken";
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
-
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function POST(request:NextRequest) {
     try {
-        const { categoryIds } = await request.json();
-        const userId = await getDataFromToken(request);
+        const { categoryIds } : {categoryIds:number[]} = await request.json() as { categoryIds: number[]};
+        const userId:number = getDataFromToken(request) as number;
 
         if(!userId || !Array.isArray(categoryIds)){
             return NextResponse.json({ status:400, message:"Invalid input"});
@@ -28,8 +28,9 @@ export async function POST(request:NextRequest) {
 
         return NextResponse.json({ status:201, message:"User categories updated successfully"});
 
-    } catch (error:any) {
-        return NextResponse.json({ status:500, message:'Internal server error'});
+    } catch (error) {
+        const errorMessage = (error as Error).message || 'Internal server error';
+        return NextResponse.json({ status: 500, message: errorMessage });
     }
     
 }

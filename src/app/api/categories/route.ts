@@ -1,16 +1,16 @@
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { NextApiRequest } from "next";
 
 const prisma = new PrismaClient();
 
-export async function GET(request:NextApiRequest) {
+export async function GET(request:NextRequest) {
     try {
 
-        const { searchParams } = new URL(request.url!);
+        const { searchParams } = new URL(request.url);
 
-        const page = parseInt(searchParams.get('page') || "1");
-        const limit = parseInt(searchParams.get('limit') || "5");
+        const page = parseInt(searchParams.get('page') ?? "1");
+        const limit = parseInt(searchParams.get('limit') ?? "6");
         const skip = (page-1) * limit;
 
         const categories = await prisma.category.findMany({
@@ -36,7 +36,7 @@ export async function GET(request:NextApiRequest) {
         }
 
         
-    } catch (error:any) {
-        return NextResponse.json({ status:500, message:"Server error"});
+    } catch (error:unknown) {
+        return Response.json({ status:405, error:(error as Error).message })
     }
 }

@@ -12,10 +12,14 @@ const initialValues={
   password:""
 }
 
-export default function page() {
+interface ApiResponse{
+  message?:string
+}
+
+export default function Login() {
 
   const router = useRouter();
-  const [isShowPassword,setIsShowPassword] = useState(false);
+  const [isShowPassword,setIsShowPassword] = useState<boolean>(false);
 
   const { values,errors,handleChange,handleSubmit,handleBlur, touched,resetForm } = useFormik({
     initialValues,
@@ -32,17 +36,16 @@ export default function page() {
         });
 
         if(!response.ok){
-          const data = await response.json();
-          toast.error(data.messgae)
+          const data:ApiResponse = await response.json() as ApiResponse;
+          toast.error(data.message ?? "An error occured")
         }
 
         toast.success("Login Successfull");
         resetForm();
         router.push("/")
         
-      } catch (error:any) {
-        toast.error(error.message);
-        console.error(error)
+      } catch (error) {
+        toast.error((error as Error).message ?? "An unexpected error occured");
       }
     }
 });

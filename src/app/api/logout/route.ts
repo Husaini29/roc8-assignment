@@ -13,7 +13,7 @@ export async function GET() {
         })
 
         return response;
-    } catch (error:any) {
-        return NextResponse.json({ error:error.message})
+    } catch (error:unknown) {
+        return Response.json({ status:405, error:(error as Error).message })
     }
 }

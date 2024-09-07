@@ -1,16 +1,16 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-export default function OtpValidation() {
+function OtpValidationComponent() {
     
-    let optLength = 8;
+    const optLength = 8;
     const router = useRouter();
     const email = useSearchParams().get("email");
 
-    const[otp,setOtp] = useState(new Array(optLength).fill(""));
+    const[otp,setOtp] = useState<string[]>(new Array(optLength).fill(""));
     
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -39,7 +39,7 @@ export default function OtpValidation() {
         e.preventDefault();
         try {        
             // check otp length
-            let verifyOtp = otp.join("");
+            const verifyOtp = otp.join("");
 
             if(verifyOtp.length === optLength){
                 const response = await fetch("/api/verifyEmail",{
@@ -51,8 +51,8 @@ export default function OtpValidation() {
                 });
 
                 if(!response.ok){
-                    const data = await response.json();
-                    toast.error(data.message || "Invalid Otp");
+                    const data: {message?:string} = await response.json() as {message?:string};
+                    toast.error(data.message ?? "Invalid Otp");
                     return
                 }
 
@@ -61,7 +61,7 @@ export default function OtpValidation() {
                 router.push("/login");
             }
         } catch (error) {
-
+            toast.error((error as Error).message)
         }
     }
 
@@ -115,4 +115,12 @@ return (
         </form>
     </div>
 )
+}
+
+export default function OtpValidation() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <OtpValidationComponent />
+        </Suspense>
+    );
 }

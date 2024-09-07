@@ -29,8 +29,8 @@ import {
                 <Heading style={h1}>Verify your email address</Heading>
                 <Text style={mainText}>
                   Thanks for starting the new Ecommerce account creation process. We
-                  want to make sure it's really you. Please enter the following
-                  verification code when prompted. If you don&apos;t want to
+                  want to make sure it is really you. Please enter the following
+                  verification code when prompted. If you do not want to
                   create an account, you can ignore this message.
                 </Text>
                 <Section style={verificationSection}>

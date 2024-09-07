@@ -1,39 +1,65 @@
 "use client"
 
 import { useRouter } from "next/navigation";
-import React,{ useEffect, useState } from "react";
+import React,{ useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface UserCategories{
+  category:{
+    id:number,
+    name:string
+  }
+}
+
+interface User{
+  id:number,
+  name:string,
+  email:string,
+  userCategories:UserCategories[]
+}
+
+interface CategoryResponse{
+  categories:Category[],
+  page:number,
+  totalPages:number
+}
 
 export default function HomePage() {
 
-  const [categories,setCategories] = useState([]);
+  const [categories,setCategories] = useState<Category[]>([]);
   const [selectedCategories,setSelectedCategories] = useState<number[]>([]);
-  const [page,setPage] = useState(1);
-  const [totalPages,setTotalPages] = useState(1);
+  const [page,setPage] = useState<number>(1);
+  const [totalPages,setTotalPages] = useState<number>(1);
 
   const router = useRouter();
 
-  const fetchUser = async()=>{
+  const fetchUser = async() : Promise<void>=>{
     try {
         const response = await fetch("/api/user");
-        const user = await response.json();
+        const user = await response.json() as User;
         console.log(user);
-        const userCategories = user.userCategories.map((uc:any)=> uc.category.id);
+        const userCategories:number[] = user.userCategories.map((uc)=> uc.category.id);
         setSelectedCategories(userCategories);
 
-    } catch (error:any) {
-      toast.error(error.message)
+    } catch (error) {
+        toast.error((error as Error).message);
     }
   }
 
-  const fetchCategories = async(page:number)=>{
+  const fetchCategories = async(page:number) : Promise<void>=>{
     try {
       const response = await fetch(`/api/categories?page=${page}&limit=6`);
-      const data = await response.json();
+      const data = await response.json() as CategoryResponse;
       setCategories(data.categories);
       setTotalPages(data.totalPages);
-    } catch (error:any) {
-      toast.error(error.message);
+    } catch (error) {
+        toast.error((error as Error).message);
     }
   };
 
@@ -51,7 +77,7 @@ export default function HomePage() {
     setPage(page);
   }
 
-  const pageNumbers = [];
+  const pageNumbers:number[] = [];
 
   for(let i= page-3;i<=page+3;i++){
     if(i<1) continue
@@ -61,7 +87,7 @@ export default function HomePage() {
   }
 
 
-  const updateUserCategories = async()=>{
+  const updateUserCategories = useCallback(async()=>{
     try {
       const response = await fetch("/api/user-categories",{
         method:"POST",
@@ -77,24 +103,24 @@ export default function HomePage() {
       } else {
         toast.error("Failed to update user categories");
       }
-    } catch (error:any) {
-        toast.error(error.message);
+    } catch (error) {
+        toast.error((error as Error).message);
     }
-  }
+  },[selectedCategories])
 
   useEffect(()=>{
-    fetchUser();
+    void fetchUser();
   },[]);
 
   useEffect(()=>{
-    fetchCategories(page);
+    void fetchCategories(page);
   },[page]);
 
   useEffect(()=>{
     if(selectedCategories.length >=1 ){
-      updateUserCategories();
+       void updateUserCategories();
     }
-  },[selectedCategories]);
+  },[selectedCategories,updateUserCategories]);
 
   return (
     <div className='flex justify-center s mt-8'>

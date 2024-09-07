@@ -18,8 +18,8 @@ export default function Header(){
             await fetch("/api/logout");
             router.push("/login");
             toast.success("Logout successfull");
-        } catch (error:any) {
-            toast.error(error.message);
+        } catch (error) {
+            toast.error((error as Error).message);
         }
     }
 
@@ -28,7 +28,7 @@ export default function Header(){
             .split("; ")
             .find(row => row.startsWith("token="))
             ?.split("=")[1];
-        setToken(token || undefined);
+        setToken(token ?? undefined);
     }
 
     useEffect(() => {

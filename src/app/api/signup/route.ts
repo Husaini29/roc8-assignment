@@ -1,15 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import VerifyEmail from "@/emails/verificationEmail"
 
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+interface SignupRequestType{
+  name:string,
+  email:string,
+  password:string
+}
+
 export async function POST(req: NextRequest) {
  
-    const { name,email, password } = await req.json();
+    const { name,email, password } : SignupRequestType = await req.json() as SignupRequestType;
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,6 +50,6 @@ export async function POST(req: NextRequest) {
       return Response.json({status:201, message: 'User registered. Please check your email to verify your account.'});
 
     } catch (error) {
-      return Response.json({status:500, message: 'Verify email address'});
+      return Response.json({ status:405, error:(error as Error).message })
     }
 }

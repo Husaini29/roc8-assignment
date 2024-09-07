@@ -1,13 +1,14 @@
 import getDataFromToken from "@/helpers/getDataFromToken";
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function GET(request:NextRequest) {
     
 try {
-    const userId = await getDataFromToken(request);
+    const userId:number = getDataFromToken(request) as number;
     const user = await prisma.user.findUnique({
         where:{ id: userId },
         select:{
@@ -32,7 +33,7 @@ try {
 
     return NextResponse.json(user);
 
-} catch (error:any) {
-    return NextResponse.json({ error: error.message });
+} catch (error) {
+    return NextResponse.json({ error:(error as Error).message });
 }
 }

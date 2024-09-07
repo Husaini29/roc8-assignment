@@ -1,12 +1,18 @@
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 
 const prisma = new PrismaClient();
 
+interface LoginRequestData {
+    email: string;
+    password: string;
+}
+
 export async function POST(req:NextRequest){
-    const { email,password } = await req.json();
+    const { email,password }: LoginRequestData = await req.json() as LoginRequestData;
 
     try {
 
@@ -34,7 +40,11 @@ export async function POST(req:NextRequest){
             name:user.name
         }
 
-        const token = await jwt.sign(tokenData,process.env.TOKEN_SECRET!,{ expiresIn: '1h' });
+        if (!process.env.TOKEN_SECRET) {
+            throw new Error("Missing environment variable: TOKEN_SECRET");
+        }
+
+        const token = jwt.sign(tokenData,process.env.TOKEN_SECRET,{ expiresIn: '1h' });
 
         const response = NextResponse.json({ status:200, messgae:"User logged in successfully"});
 
@@ -43,7 +53,7 @@ export async function POST(req:NextRequest){
         })
         return response;
         
-    } catch (error) {
-        return Response.json({ status:405, message:"Internal server error"})
+    } catch (error:unknown) {
+        return Response.json({ status:405, error:(error as Error).message })
     }
 }

@@ -3,7 +3,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation';
 import { useFormik } from "formik";
-import { signupSchema } from '@/schemas/signupSchema';
+import { signupSchema } from '../../schemas/signupSchema';
 import { toast } from "react-hot-toast";
 
 const initialValues ={
@@ -12,7 +12,7 @@ const initialValues ={
   password:""
 }
 
-export default function page() {
+export default function Signup() {
 
   const router = useRouter();
 
@@ -32,16 +32,16 @@ export default function page() {
         });
 
         if(!response.ok){
-          const data = await response.json();
-          toast.error(data.messgae)
+          const data : {message?:string} = await response.json() as {message?:string};
+          toast.error(data.message ?? "An error occured")
         }
 
         resetForm();
         router.push(`/verify-email?email=${encodeURIComponent(values.email)}`);
         toast.success("Signup successfull. Please verify your email");
 
-      } catch (error:any) {
-        toast.error(error.message);
+      } catch (error) {
+        toast.error((error as Error).message);
         console.error(error)
       }
     }
