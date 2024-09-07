@@ -13,7 +13,8 @@ const initialValues={
 }
 
 interface ApiResponse{
-  message?:string
+  message?:string,
+  error?:string
 }
 
 export default function Login() {
@@ -36,13 +37,19 @@ export default function Login() {
         });
 
         if(!response.ok){
-          const data:ApiResponse = await response.json() as ApiResponse;
           toast.error(data.message ?? "An error occured")
         }
 
-        toast.success("Login Successfull");
+        const data:ApiResponse = await response.json() as ApiResponse;
+
+        if(data.error){
+          toast.error(data.error)
+        } else{
+          toast.success("Login Successfull");
+          router.push("/");
+        }
+
         resetForm();
-        router.push("/")
         
       } catch (error) {
         toast.error((error as Error).message ?? "An unexpected error occured");
