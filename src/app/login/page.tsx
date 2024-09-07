@@ -37,7 +37,7 @@ export default function Login() {
         });
 
         if(!response.ok){
-          toast.error(data.message ?? "An error occured")
+          toast.error("An error occured");
         }
 
         const data:ApiResponse = await response.json() as ApiResponse;
